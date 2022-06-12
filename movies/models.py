@@ -4,9 +4,9 @@ class Movie(models.Model):
     title            = models.CharField(max_length=100)
     poster_url       = models.URLField(max_length=600)
     description      = models.TextField()
-    reservation_rate = models.DecimalField(max_digits=5, decimal_places=2)
-    total_viewer     = models.PositiveIntegerField()
-    age_limit        = models.PositiveIntegerField()
+    reservation_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    total_viewer     = models.PositiveIntegerField(default=0)
+    age_limit        = models.CharField(max_length=45)
     release_date     = models.DateField()
     running_time     = models.TimeField()
 
