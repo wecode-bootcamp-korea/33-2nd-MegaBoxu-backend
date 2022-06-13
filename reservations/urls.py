@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import ReservationView
+from .views import RegionTheaterListView, MovieTheaterView
 
 urlpatterns = [
-    path('', ReservationView.as_view())
+    path('', MovieTheaterView.as_view()),
+    path('/region-theater', RegionTheaterListView.as_view())    
 ]

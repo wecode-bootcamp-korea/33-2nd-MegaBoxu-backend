@@ -2,9 +2,9 @@ from datetime import datetime
 
 from django.views import View
 from django.http import JsonResponse
-from django.db.models import Q, Sum, Avg, Count
+from django.db.models import Q, Sum, Avg
 
-from .models import Movie, DailyViewer
+from .models import Movie
 
 class MovieListView(View):
 
