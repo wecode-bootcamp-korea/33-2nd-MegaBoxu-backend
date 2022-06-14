@@ -7,14 +7,9 @@ def login_decorator(func):
     def wrapper(self, request, *args, **kwargs):
 
         try:
-            print("====================a======================")
             access_token = request.headers.get('Authorization', None)
-            print("================", access_token)
             payload      = jwt.decode(access_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-            print("========payload: " , payload )
             request.user = User.objects.get(id=payload['id'])
-            print("=========",request.user)
-            
 
             return func(self, request, *args, **kwargs)
 
@@ -28,8 +23,3 @@ def login_decorator(func):
             return JsonResponse({"message": "EXPIRED_TOKEN"},print(access_token), status = 400)
 
     return wrapper
-
-# def review_decorator(func):
-#     def wrapper(self, request, *args **kwargs):
-#         try:
-            
