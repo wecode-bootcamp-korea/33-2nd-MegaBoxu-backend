@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-
 from django.views import View
 from django.http import JsonResponse
 from django.db.models import Q, Avg, Count, Sum

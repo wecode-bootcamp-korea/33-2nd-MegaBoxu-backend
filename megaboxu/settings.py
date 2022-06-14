@@ -1,5 +1,5 @@
 from pathlib import Path
-from my_settings import SECRET_KEY, DATABASES, ALGORITHM
+from my_settings import SECRET_KEY, DATABASES, ALGORITHM, KAKAO_APPKEY #KAKAO_REDIRECT_URI
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,6 +13,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'django.contrib.sites',
+    'django.contrib.auth',
+    'django_extensions',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'storages',
+    'rest_framework',
     'cores',
     'users',
     'movies',
@@ -52,6 +61,21 @@ WSGI_APPLICATION = 'megaboxu.wsgi.application'
 SECRET_KEY = SECRET_KEY
 DATABASES = DATABASES
 ALGORITHM = ALGORITHM
+KAKAO_APPKEY = KAKAO_APPKEY
+# KAKAO_REDIRECT_URI = KAKAO_REDIRECT_URI
+AWS_ACCESS_KEY_ID = 'AKIAQTP6QBOZ35YUU6E6'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'megaboxu-s3-bucket'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl' : 'max-age = 86400'
+}
+AWS_LOCATION = 'static/'
+AWS_QUERYSTRING_AUTH = False
+AWS_HEADERS = {
+    'Access-control-Allow-Origin' : '*',
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -76,7 +100,14 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+# STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = False
