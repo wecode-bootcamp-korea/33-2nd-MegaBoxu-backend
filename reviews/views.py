@@ -27,6 +27,7 @@ class MovieReviewView(View):
             data      = request.POST
             content   = data['content']
             rating    = data['rating']
+
             self.s3_client.upload_fileobj(
                 file,
                 "megaboxu-s3-bucket",
@@ -53,9 +54,9 @@ class MovieReviewView(View):
     @login_decorator
     def delete(self, request, movie_id):
         try:
-            user      = request.user
-            review_id = Review.objects.get(user_id = 23).delete()
-
+            user = request.user
+        
+            review_id = Review.objects.get(user_id = request.user.id, id = review_id).delete()
             return JsonResponse({"message" : "DELETE_SUCCESS"}, status = 200)
 
         except Review.DoesNotExist:
@@ -63,7 +64,8 @@ class MovieReviewView(View):
 
     def get(self, request, movie_id):
         reviews = Review.objects.filter(movie_id= movie_id)
-        result  = [{
+
+        result = [{
                   'id'        : review.id,
                   'user'      : review.user.name,
                   'image_url' : review.image_url,
