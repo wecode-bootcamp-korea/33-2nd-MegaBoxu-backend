@@ -1,28 +1,42 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.views import View
 from django.http import JsonResponse
-from django.db.models import Q, Sum, Avg
+from django.db.models import Q, Avg, Count, Sum
 
 from .models import Movie
 
-class MovieListView(View):
+TODAY = str(datetime.today().replace(tzinfo=timezone.utc).date())
 
+class MovieListView(View):
     def get(self, request):
         
-        sort   = request.GET.get("sort", None)
-        offset = int(request.GET.get("offset", 0))
-        limit  = int(request.GET.get("limit", 20))
-        search = request.GET.get("search", None)
-        q = Q()
-
-        if sort == 'released':
+        date        = request.GET.get("date", TODAY)
+        is_released = request.GET.get("released", False)
+        sort        = request.GET.get("sort", "-reservation_rate")
+        offset      = int(request.GET.get("offset", 0))
+        limit       = int(request.GET.get("limit", 999))
+        search      = request.GET.get("search", None)
+        q           = Q()
+        
+        if is_released == 'True' :
             q.add(Q(release_date__lte=datetime.now().date()), q.AND)
 
         if search :
             q.add(Q(title__contains=search), q.AND)
-             
-        movies = Movie.objects.filter(q).order_by('-reservation_rate')[offset:limit]
+        
+        if date == TODAY:
+            from_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            to_time   = datetime.now().strftime("%Y-%m-%d 23:59:59")
+        
+        else :
+            from_time = date + " 00:00:00"
+            to_time   = date + " 23:59:59"
+        
+        cnt_available = Count('movietheater', filter=Q(movietheater__start_time__gte=from_time, movietheater__start_time__lte=to_time))
+        
+        movies = Movie.objects.filter(q).annotate(cnt_available=cnt_available).order_by(sort)[offset:limit]
+
         result = [{
             'movie_id'        : movie.id,
             'title'           : movie.title,
@@ -31,12 +45,13 @@ class MovieListView(View):
             'reservation_rate': movie.reservation_rate,
             'age_limit'       : movie.age_limit,
             'release_date'    : movie.release_date.strftime("%Y.%m.%d"),
+            'average_rating'  : movie.review_set.all().aggregate(Avg('rating'))['rating__avg'],
+            'is_available'    : bool(movie.cnt_available)
         } for movie in movies]
         
         return JsonResponse({'result' : result}, status=200)
 
 class MovieDetailView(View):
-
     def get(self, request):
 
         try:
