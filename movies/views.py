@@ -70,7 +70,7 @@ class MovieDetailView(View):
                 'reservation_rate': movie.reservation_rate,
                 'age_limit'       : movie.age_limit,
                 'release_date'    : movie.release_date.strftime("%Y.%m.%d"),
-                'average_rating'  : avg_rating['rating__avg'].normalize(),
+                'average_rating'  : avg_rating['rating__avg'],
                 'total_viewer'    : total_viewer['count__sum'],
                 'daily_viewers'   : [{
                     'date'  : viewer.date.strftime("%Y.%m.%d"),
